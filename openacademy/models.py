@@ -11,6 +11,9 @@ class openacademy(models.Model):
     responsible_id = fields.Many2one('res.users',
     ondelete='set null', string="Responsable", index=True)
 
+    session_ids = fields.One2many(
+            'openacademy.session', 'course_id', string="Sesiones")
+
 class Session(models.Model):
     _name = 'openacademy.session'
 
