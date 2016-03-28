@@ -47,6 +47,7 @@ class Session(models.Model):
     duration = fields.Float(digits=(6, 2), help="Duration in days")
     seats = fields.Integer(string="Number of seats")
     active = fields.Boolean(default=True)
+    color = fields.Integer()
 
     instructor_id = fields.Many2one('res.partner', string="Instructor",
         domain=[('instructor', '=', True),
@@ -61,6 +62,9 @@ class Session(models.Model):
 
     hours = fields.Float(string="Duration in hours",
             compute='_get_hours', inverse='_set_hours')
+
+    attendees_count = fields.Integer(
+            string="Attendees count", compute='_get_attendees_count', store=True)
 
     @api.depends('seats', 'attendee_ids')
     def _taken_seats(self):
@@ -119,6 +123,11 @@ class Session(models.Model):
     def _set_hours(self):
         for r in self:
             r.duration = r.hours / 24
+
+    @api.depends('attendee_ids')
+    def _get_attendees_count(self):
+        for r in self:
+            r.attendees_count = len(r.attendee_ids)
 
     @api.constrains('instructor_id', 'attendee_ids')
     def _check_instructor_not_in_attendees(self):
